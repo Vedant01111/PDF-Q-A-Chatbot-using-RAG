@@ -9,6 +9,8 @@ import requests
 import streamlit as st
 
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
+if not BACKEND_URL.startswith("http://") and not BACKEND_URL.startswith("https://"):
+    BACKEND_URL = f"http://{BACKEND_URL}"
 
 st.set_page_config(page_title="PDF Q&A Chatbot", page_icon="📄", layout="centered")
 st.title("📄 PDF Q&A Chatbot (RAG)")
