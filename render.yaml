@@ -1,3 +1,28 @@
+# Render Blueprint — deploys this app with one click / one CLI command.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Creates:
+#   - pdfqa-backend    Web service (FastAPI). NOTE: this is publicly
+#                        reachable — Render's free plan does not support
+#                        private services (`pserv` requires a paid Team
+#                        plan), so the backend gets a public URL too, even
+#                        though only the frontend is meant to use it. No
+#                        secrets are exposed through any endpoint, so this
+#                        is safe, just not ideal for a "real" production app.
+#   - pdfqa-frontend   Web service (Streamlit) — this is the URL you open
+#
+# NOTE: this Blueprint does NOT create its own Postgres database — Render's
+# free plan allows only one free database per account. DATABASE_URL is set
+# manually in the dashboard instead, pointing at an existing free database
+# (see README "Option C" for details).
+#
+# NOTE on the free plan: free services have NO persistent disk. Uploaded PDFs
+# and their FAISS indexes live only in the container's ephemeral filesystem,
+# so they're wiped whenever the backend restarts, redeploys, or spins back up
+# after sleeping. Conversation history is safe (it's in Postgres, not on disk).
+# If you want uploads to survive restarts, upgrade pdfqa-backend to a paid
+# plan and add a `disk:` block mounted at /app/backend/data.
+
 services:
   - type: web
     name: pdfqa-backend
@@ -24,15 +49,15 @@ services:
       - key: TOP_K
         value: "4"
 
-  -   - type: web
-        name: pdfqa-frontend
-        runtime: docker
-        dockerfilePath: frontend/Dockerfile
-        dockerContext: .
-        plan: free
-        envVars:
-      -     key: BACKEND_URL
-            fromService:
-            type: web
-            name: pdfqa-backend
-            envVarKey: RENDER_EXTERNAL_URL
+  - type: web
+    name: pdfqa-frontend
+    runtime: docker
+    dockerfilePath: frontend/Dockerfile
+    dockerContext: .
+    plan: free
+    envVars:
+      - key: BACKEND_URL
+        fromService:
+          type: web
+          name: pdfqa-backend
+          envVarKey: RENDER_EXTERNAL_URL
