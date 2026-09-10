@@ -19,7 +19,7 @@ from typing import List, Dict, Any
 from dotenv import load_dotenv
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import FastEmbedEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_openai import ChatOpenAI
 from langchain_groq import ChatGroq
@@ -30,7 +30,7 @@ from langchain_core.messages import HumanMessage, AIMessage
 
 load_dotenv()
 
-EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "BAAI/bge-small-en-v1.5")
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq")  # "groq" (free) or "openai"
 LLM_MODEL = os.getenv("LLM_MODEL", "llama-3.3-70b-versatile" if LLM_PROVIDER == "groq" else "gpt-4o-mini")
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", 1000))
@@ -43,7 +43,7 @@ VECTORSTORE_DIR.mkdir(parents=True, exist_ok=True)
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 # Embedding model is loaded once and reused across documents/requests.
-_embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
+_embeddings = FastEmbedEmbeddings(model_name=EMBEDDING_MODEL)
 
 SYSTEM_PROMPT = (
     "You are a careful assistant answering questions about a specific PDF document. "
