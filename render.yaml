@@ -24,15 +24,15 @@ services:
       - key: TOP_K
         value: "4"
 
-  - type: web
-    name: pdfqa-frontend
-    runtime: docker
-    dockerfilePath: frontend/Dockerfile
-    dockerContext: .
-    plan: free
-    envVars:
-      - key: BACKEND_URL
-        fromService:
-          type: web
-          name: pdfqa-backend
-          property: hostport
+  -   - type: web
+        name: pdfqa-frontend
+        runtime: docker
+        dockerfilePath: frontend/Dockerfile
+        dockerContext: .
+        plan: free
+        envVars:
+      -     key: BACKEND_URL
+            fromService:
+            type: web
+            name: pdfqa-backend
+            envVarKey: RENDER_EXTERNAL_URL
