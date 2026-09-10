@@ -1,25 +1,9 @@
-# Render Blueprint — deploys this app with one click / one CLI command.
-# Docs: https://render.com/docs/blueprint-spec
-#
-# Creates:
-#   - pdfqa-db        Free managed Postgres (conversation history)
-#   - pdfqa-backend    Private service (FastAPI) — not publicly reachable,
-#                        only the frontend can talk to it, over Render's
-#                        internal network
-#   - pdfqa-frontend   Public web service (Streamlit) — this is the URL you open
-#
 # NOTE on the free plan: free services have NO persistent disk. Uploaded PDFs
 # and their FAISS indexes live only in the container's ephemeral filesystem,
 # so they're wiped whenever the backend restarts, redeploys, or spins back up
 # after sleeping. Conversation history is safe (it's in Postgres, not on disk).
 # If you want uploads to survive restarts, upgrade pdfqa-backend to a paid
 # plan and add a `disk:` block mounted at /app/backend/data.
-
-databases:
-  - name: pdfqa-db
-    databaseName: pdfqa
-    user: raguser
-    plan: free
 
 services:
   - type: pserv
@@ -30,9 +14,7 @@ services:
     plan: free
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: pdfqa-db
-          property: connectionString
+        sync: false   # set this manually in the Render dashboard — see README
       - key: LLM_PROVIDER
         value: groq
       - key: LLM_MODEL
